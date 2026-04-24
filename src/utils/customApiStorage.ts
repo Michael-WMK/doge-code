@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto'
 import { getGlobalConfig, saveGlobalConfig } from './config.js'
+import { normalizeApiKeyForConfig } from './authPortable.js'
 import { getSecureStorage } from './secureStorage/index.js'
 
 export type OpenAICompatMode = 'chat_completions' | 'responses'
@@ -292,6 +293,12 @@ export function formatCustomApiProviderIndex(index: number): string {
 
 export function persistCustomApiProviders(next: CustomApiProvidersStorageData): void {
   const finalized = finalizeProviders(next.providers ?? [], next.currentProviderId)
+  const currentProvider = finalized.providers?.find(
+    provider => provider.id === finalized.currentProviderId,
+  )
+  const normalizedKey = currentProvider?.apiKey
+    ? normalizeApiKeyForConfig(currentProvider.apiKey)
+    : undefined
   saveGlobalConfig(current => ({
     ...current,
     customApiProviders: (finalized.providers ?? []).map(provider => ({
@@ -299,6 +306,19 @@ export function persistCustomApiProviders(next: CustomApiProvidersStorageData): 
       apiKey: undefined,
     })),
     currentCustomApiProviderId: finalized.currentProviderId,
+    customApiKeyResponses: normalizedKey
+      ? {
+          approved: [
+            ...new Set([
+              ...(current.customApiKeyResponses?.approved ?? []),
+              normalizedKey,
+            ]),
+          ],
+          rejected: (current.customApiKeyResponses?.rejected ?? []).filter(
+            key => key !== normalizedKey,
+          ),
+        }
+      : current.customApiKeyResponses,
   }))
   writeCustomApiProvidersStorage(finalized)
 }

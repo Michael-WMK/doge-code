@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react'
 import type { CommandResultDisplay } from '../../commands.js'
 import { Select } from '../../components/CustomSelect/index.js'
 import { Dialog } from '../../components/design-system/Dialog.js'
-import { Pane } from '../../components/design-system/Pane.js'
 import TextInput from '../../components/TextInput.js'
 import { Box, Text } from '../../ink.js'
 import type { LocalJSXCommandCall } from '../../types/command.js'
@@ -78,8 +77,7 @@ function ProviderManager({ onDone }: Props): React.ReactNode {
 
   if (screen.type === 'list') {
     return (
-      <Pane color="permission">
-        <Dialog
+      <Dialog
           title="Providers"
           subtitle="Enter to view and edit a provider."
           onCancel={() =>
@@ -108,8 +106,7 @@ function ProviderManager({ onDone }: Props): React.ReactNode {
             }
             visibleOptionCount={10}
           />
-        </Dialog>
-      </Pane>
+      </Dialog>
     )
   }
 
@@ -154,8 +151,7 @@ function ProviderManager({ onDone }: Props): React.ReactNode {
     ]
 
     return (
-      <Pane color="permission">
-        <Dialog
+      <Dialog
           title={`${provider.name} (${formatCustomApiProviderIndex(providerIndex)})`}
           subtitle="Enter to edit a field. Esc to go back."
           onCancel={() => setScreen({ type: 'list' })}
@@ -197,8 +193,7 @@ function ProviderManager({ onDone }: Props): React.ReactNode {
             onCancel={() => setScreen({ type: 'list' })}
             visibleOptionCount={10}
           />
-        </Dialog>
-      </Pane>
+      </Dialog>
     )
   }
 
@@ -210,8 +205,7 @@ function ProviderManager({ onDone }: Props): React.ReactNode {
     }
 
     return (
-      <Pane color="permission">
-        <Dialog
+      <Dialog
           title="Edit API format"
           subtitle="Select the provider API type."
           onCancel={() => setScreen({ type: 'detail', providerId: provider.id })}
@@ -255,8 +249,7 @@ function ProviderManager({ onDone }: Props): React.ReactNode {
             }}
             onCancel={() => setScreen({ type: 'detail', providerId: provider.id })}
           />
-        </Dialog>
-      </Pane>
+      </Dialog>
     )
   }
 
@@ -268,8 +261,7 @@ function ProviderManager({ onDone }: Props): React.ReactNode {
     }
 
     return (
-      <Pane color="permission">
-        <Dialog
+      <Dialog
           title="Delete provider"
           subtitle={`Delete ${provider.name}?`}
           onCancel={() => setScreen({ type: 'detail', providerId: provider.id })}
@@ -312,8 +304,7 @@ function ProviderManager({ onDone }: Props): React.ReactNode {
             }}
             onCancel={() => setScreen({ type: 'detail', providerId: provider.id })}
           />
-        </Dialog>
-      </Pane>
+      </Dialog>
     )
   }
 
@@ -324,49 +315,47 @@ function ProviderManager({ onDone }: Props): React.ReactNode {
   }
 
   return (
-    <Pane color="permission">
-      <Dialog
-        title={screen.title}
-        subtitle="Enter to save. Esc to cancel."
-        onCancel={() => setScreen({ type: 'detail', providerId: provider.id })}
-        isCancelActive={false}
-      >
-        <Box borderStyle="round" paddingLeft={1}>
-          <TextInput
-            showCursor
-            value={inputValue}
-            onChange={setInputValue}
-            onSubmit={value => {
-              const trimmed = value.trim()
-              updateCustomApiProviders(current => ({
-                ...current,
-                providers: (current.providers ?? []).map(item => {
-                  if (item.id !== provider.id) return item
-                  if (screen.field === 'model') {
-                    const nextSavedModels = trimmed
-                      ? [...new Set([...(item.savedModels ?? []), trimmed])]
-                      : item.savedModels
-                    return {
-                      ...item,
-                      model: trimmed || undefined,
-                      savedModels: nextSavedModels,
-                    }
+    <Dialog
+      title={screen.title}
+      subtitle="Enter to save. Esc to cancel."
+      onCancel={() => setScreen({ type: 'detail', providerId: provider.id })}
+      isCancelActive={false}
+    >
+      <Box borderStyle="round" paddingLeft={1}>
+        <TextInput
+          showCursor
+          value={inputValue}
+          onChange={setInputValue}
+          onSubmit={value => {
+            const trimmed = value.trim()
+            updateCustomApiProviders(current => ({
+              ...current,
+              providers: (current.providers ?? []).map(item => {
+                if (item.id !== provider.id) return item
+                if (screen.field === 'model') {
+                  const nextSavedModels = trimmed
+                    ? [...new Set([...(item.savedModels ?? []), trimmed])]
+                    : item.savedModels
+                  return {
+                    ...item,
+                    model: trimmed || undefined,
+                    savedModels: nextSavedModels,
                   }
-                  return { ...item, [screen.field]: trimmed || undefined }
-                }),
-              }))
-              syncProviderEnv(getProvider(provider.id))
-              setScreen({ type: 'detail', providerId: provider.id })
-            }}
-            placeholder={screen.placeholder}
-            columns={80}
-            cursorOffset={cursorOffset}
-            onChangeCursorOffset={setCursorOffset}
-          />
-        </Box>
-        <Text dimColor>Enter to save · Esc to cancel</Text>
-      </Dialog>
-    </Pane>
+                }
+                return { ...item, [screen.field]: trimmed || undefined }
+              }),
+            }))
+            syncProviderEnv(getProvider(provider.id))
+            setScreen({ type: 'detail', providerId: provider.id })
+          }}
+          placeholder={screen.placeholder}
+          columns={80}
+          cursorOffset={cursorOffset}
+          onChangeCursorOffset={setCursorOffset}
+        />
+      </Box>
+      <Text dimColor>Enter to save · Esc to cancel</Text>
+    </Dialog>
   )
 }
 
