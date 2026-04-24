@@ -1117,7 +1117,7 @@ function PromptInput({
     agents,
     setSuggestionsState,
     suggestionsState,
-    suppressSuggestions: isSearchingHistory || historyIndex > 0,
+    suppressSuggestions: isSearchingHistory || historyIndex > 0 && !input.startsWith('/'),
     markAccepted,
     onModeChange
   });
